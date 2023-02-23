@@ -9,6 +9,6 @@ const Vote = `
   type Query {
     vote(id: String!): Vote
   }
-`
+`;
 
-export default [Vote]
+export default [Vote];
