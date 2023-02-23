@@ -39,8 +39,9 @@ const main = async (): Promise<void> => {
         }),
       },
       Mutation: {
-        createUser: async (_, { name }: { name: string }) =>
-          await UserDB.create({ name }),
+        createUser: async (_, { name }: { name: string }) => {
+          return await UserDB.create({ name, email: "", password: "" });
+        },
       },
     },
   });
