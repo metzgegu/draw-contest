@@ -9,6 +9,6 @@ const User = sequelize.define('User', {
   }
 }, {
   // Other model options go here
-});
+})
 
 module.exports = User

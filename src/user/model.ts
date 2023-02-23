@@ -1,7 +1,5 @@
-import { Sequelize, DataTypes } from 'sequelize'
-import sequelize from '../client/database';
-import bcrypt from 'bcrypt'
-
+import { DataTypes } from 'sequelize'
+import sequelize from '../client/database'
 
 const User = sequelize.define('User', {
   name: {
@@ -15,8 +13,8 @@ const User = sequelize.define('User', {
   password: {
     type: DataTypes.STRING,
     allowNull: false
-  },
-}, 
+  }
+}
 // {
 //   hooks: {
 //    beforeCreate: async (user) => {
@@ -38,6 +36,6 @@ const User = sequelize.define('User', {
 //    }
 //   }
 //  }
-);
+)
 
 export default User
