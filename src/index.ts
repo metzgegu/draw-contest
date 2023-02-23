@@ -10,6 +10,7 @@ import { json } from 'body-parser';
 import express from 'express';
 
 import User from './user/schema'
+import UserDB from './database/models/user'
 import DrawingContest from './drawing-contest/schema'
 import Vote from './vote/schema'
 import Contest from './contest/schema'
@@ -30,6 +31,9 @@ const main = async () => {
         contest: (_, { id }) => ({ id, name: 'Contest numero uno' }),
         vote: (_, { id }) => ({ id, userId: '1' }),
         drawingContest: (_, { id }) => ({ id, userId: '1', contestId: '2' }),
+      },
+      Mutation: {
+        createUser: (_, { name }) => UserDB.create({ name })
       }
     },
   });
@@ -37,8 +41,8 @@ const main = async () => {
   await server.start();
 
   app.use('/graphql', cors<cors.CorsRequest>(), json(), expressMiddleware(server))
-  await new Promise<void>((resolve) => httpServer.listen({ port: 4000 }, resolve))
-  console.log(`🚀 Server ready at http://localhost:4000/`)
+  await new Promise<void>((resolve) => httpServer.listen({ port: 3000 }, resolve))
+  console.log(`🚀 Server ready at http://localhost:3000/`)
 }
 
 main()

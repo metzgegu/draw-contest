@@ -7,6 +7,10 @@ const User = `
   type Query {
     user(id: String!): User
   }
+
+  type Mutation {
+    createUser(name: String!): User! 
+  }
 `
 
 export default [User]

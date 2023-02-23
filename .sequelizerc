@@ -1,0 +1,10 @@
+const path = require('path')
+
+const databaseFolder = paths => path.resolve('src', 'database', paths)
+
+module.exports = {
+  'config': databaseFolder('config.js'),
+  'models-path': databaseFolder('models'),
+  'migrations-path': databaseFolder('migrations'),
+  'seeders-path': databaseFolder('seeds'),
+}
