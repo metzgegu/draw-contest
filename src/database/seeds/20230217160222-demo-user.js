@@ -1,4 +1,4 @@
-"use strict";
+'use strict'
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -10,17 +10,17 @@ module.exports = {
 
     */
     await queryInterface.bulkInsert(
-      "Users",
+      'Users',
       [
         {
-          name: "John Doe",
-          email: "john.doe@yopmail.co",
+          name: 'John Doe',
+          email: 'john.doe@yopmail.co',
           createdAt: new Date(),
           updatedAt: new Date(),
         },
       ],
       {}
-    );
+    )
   },
 
   async down(queryInterface, Sequelize) {
@@ -30,6 +30,6 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    await queryInterface.bulkDelete("Users", null, {});
+    await queryInterface.bulkDelete('Users', null, {})
   },
-};
+}

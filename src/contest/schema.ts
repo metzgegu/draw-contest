@@ -9,6 +9,6 @@ const Contest = `
   type Query {
     contest(id: String!): Contest
   }
-`;
+`
 
-export default [Contest];
+export default [Contest]

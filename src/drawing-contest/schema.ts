@@ -11,6 +11,6 @@ const DrawingContest = `
   type Query {
     drawingContest(id: String!): DrawingContest
   }
-`;
+`
 
-export default [DrawingContest];
+export default [DrawingContest]

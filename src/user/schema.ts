@@ -11,6 +11,6 @@ const User = `
   type Mutation {
     createUser(name: String!): User! 
   }
-`;
+`
 
-export default [User];
+export default [User]
