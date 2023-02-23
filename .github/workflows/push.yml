@@ -1,0 +1,33 @@
+name: Lint & Tests
+
+on: push
+
+env:
+  NODE_VERSION: 18
+
+jobs:
+  testAndLint:
+    name: Linting # job name (unique id)
+    runs-on: ubuntu-latest # on which machine to run
+    steps: # list of steps
+      - name: Install NodeJS
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Code Checkout
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: "./node/.nvmrc"
+          cache-dependency-path: "./node/yarn.lock"
+          registry-url: "https://npm.pkg.github.com"
+          cache: "yarn"
+
+      - name: Install dependencies
+        working-directory: ${{ env.working-directory }}
+        run: yarn install --frozen-lockfile
+
+      - name: Lint
+        run: yarn lint

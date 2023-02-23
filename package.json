@@ -8,7 +8,8 @@
     "dev": "npx nodemon",
     "build": "rimraf ./build && tsc",
     "start": "yarn build && node build/index.js",
-    "lint": "yarn eslint 'src/**' --fix && prettier --write ."
+    "lint": "yarn eslint 'src/**' && prettier --check .",
+    "lint:fix": "yarn eslint 'src/**' --fix && prettier --write ."
   },
   "keywords": [],
   "author": "",
