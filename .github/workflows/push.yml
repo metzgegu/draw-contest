@@ -20,8 +20,8 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version-file: "./node/.nvmrc"
-          cache-dependency-path: "./node/yarn.lock"
+          node-version-file: ".nvmrc"
+          cache-dependency-path: "yarn.lock"
           registry-url: "https://npm.pkg.github.com"
           cache: "yarn"
 
