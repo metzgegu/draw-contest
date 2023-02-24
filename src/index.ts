@@ -10,10 +10,11 @@ import { json } from 'body-parser'
 import express from 'express'
 
 import User from './user/schema'
-import UserDB from './database/models/user'
+import UserDB, { UserAttributes } from './database/models/user'
 import DrawingContest from './drawing-contest/schema'
 import Vote from './vote/schema'
 import Contest from './contest/schema'
+import { createToken, getEncryptedPassword, isPasswordValid } from './user/auth'
 
 // instance before passing the instance to `expressMiddleware`
 const main = async (): Promise<void> => {
@@ -24,8 +25,12 @@ const main = async (): Promise<void> => {
     typeDefs: [...User, ...Contest, ...Vote, ...DrawingContest],
     resolvers: {
       Query: {
-        user: (_, { id }: { id: string }) => {
-          return { id, name: 'hello' }
+        user: async (_, { id }: { id: string }) => {
+          return await UserDB.findOne({
+            where: {
+              id,
+            },
+          })
         },
         contest: (_, { id }: { id: string }) => ({
           id,
@@ -39,8 +44,40 @@ const main = async (): Promise<void> => {
         }),
       },
       Mutation: {
-        createUser: async (_, { name }: { name: string }) => {
-          return await UserDB.create({ name, email: '', password: '' })
+        signup: async (_, user: UserAttributes) => {
+          const newUser = await UserDB.create({
+            ...user,
+            password: await getEncryptedPassword(user.password),
+          })
+
+          const token = createToken(newUser.id!)
+
+          return {
+            token,
+            user: newUser,
+          }
+        },
+        login: async (
+          _,
+          { email, password }: { email: string; password: string }
+        ) => {
+          const user = await UserDB.findOne({ where: { email } })
+
+          if (!user) {
+            throw new Error('No such user found')
+          }
+
+          const valid = await isPasswordValid(password, user.password)
+          if (!valid) {
+            throw new Error('Invalid password')
+          }
+
+          const token = createToken(user.id!)
+
+          return {
+            token,
+            user,
+          }
         },
       },
     },

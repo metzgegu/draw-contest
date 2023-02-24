@@ -2,6 +2,13 @@ const User = `
   type User {
     id: ID!
     name: String
+    email: String
+    password: String
+  }
+
+  type AuthPayload {
+    token: String
+    user: User
   }
 
   type Query {
@@ -9,7 +16,8 @@ const User = `
   }
 
   type Mutation {
-    createUser(name: String!): User! 
+    signup(name: String!, password: String!, email: String!): AuthPayload! 
+    login(email: String!, password: String!): AuthPayload!
   }
 `
 

@@ -1,35 +1,34 @@
 import { DataTypes, type Model } from 'sequelize'
 import { sequelize } from '.'
 
-export interface UserAttributes {
+export interface ContestAttributes {
   id?: string
   name: string
   email: string
   password: string
 }
 
-interface UserCreationAttributes extends UserAttributes {}
+interface ContestCreationAttributes extends ContestAttributes {}
 
-export interface UserInstance
-  extends Model<UserAttributes, UserCreationAttributes>,
-    UserAttributes {
+export interface ContestInstance
+  extends Model<ContestAttributes, ContestCreationAttributes>,
+    ContestAttributes {
   createdAt?: Date
   updatedAt?: Date
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-const User = sequelize.define<UserInstance>('User', {
+const Contest = sequelize.define<ContestInstance>('Contest', {
   name: {
     type: DataTypes.STRING,
     allowNull: false,
   },
   email: {
     type: DataTypes.STRING,
-    unique: true,
   },
   password: {
     type: DataTypes.STRING,
   },
 })
 
-export default User
+export default Contest
