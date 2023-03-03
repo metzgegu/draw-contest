@@ -11,7 +11,8 @@ import express from 'express'
 
 import User from './user/schema'
 import UserDB, { UserAttributes } from './database/models/user'
-import DrawingContest from './drawing-contest/schema'
+import ContestDB, { ContestAttributes, Status } from './database/models/contest'
+import DrawingParticipation from './drawing-participation/schema'
 import Vote from './vote/schema'
 import Contest from './contest/schema'
 import { createToken, getEncryptedPassword, isPasswordValid } from './user/auth'
@@ -22,7 +23,7 @@ const main = async (): Promise<void> => {
   const httpServer = http.createServer(app)
 
   const server = new ApolloServer({
-    typeDefs: [...User, ...Contest, ...Vote, ...DrawingContest],
+    typeDefs: [...User, ...Contest, ...Vote, ...DrawingParticipation],
     resolvers: {
       Query: {
         user: async (_, { id }: { id: string }) => {
@@ -37,7 +38,7 @@ const main = async (): Promise<void> => {
           name: 'Contest numero uno',
         }),
         vote: (_, { id }: { id: string }) => ({ id, userId: '1' }),
-        drawingContest: (_, { id }: { id: string }) => ({
+        drawingParticipation: (_, { id }: { id: string }) => ({
           id,
           userId: '1',
           contestId: '2',
@@ -78,6 +79,15 @@ const main = async (): Promise<void> => {
             token,
             user,
           }
+        },
+        createContest: async (_, { name, adminUserId }: ContestAttributes) => {
+          const contest = await ContestDB.create({
+            name,
+            adminUserId,
+            status: Status.OPEN,
+          })
+
+          return contest
         },
       },
     },

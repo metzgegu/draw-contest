@@ -9,6 +9,10 @@ const Contest = `
   type Query {
     contest(id: String!): Contest
   }
+
+  type Mutation {
+    createContest(name: String!, adminUserId: String!): Contest 
+  }
 `
 
 export default [Contest]

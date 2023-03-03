@@ -1,11 +1,18 @@
 import { DataTypes, type Model } from 'sequelize'
 import { sequelize } from '.'
 
+export enum Status {
+  OPEN = 'OPEN',
+  CLOSED = 'CLOSED',
+  ONGOING = 'ONGOING',
+  VOTING = 'VOTING',
+}
+
 export interface ContestAttributes {
   id?: string
   name: string
-  email: string
-  password: string
+  status: string
+  adminUserId: string
 }
 
 interface ContestCreationAttributes extends ContestAttributes {}
@@ -23,10 +30,10 @@ const Contest = sequelize.define<ContestInstance>('Contest', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  email: {
+  status: {
     type: DataTypes.STRING,
   },
-  password: {
+  adminUserId: {
     type: DataTypes.STRING,
   },
 })
