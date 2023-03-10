@@ -1,95 +1,24 @@
 import { ApolloServer } from '@apollo/server'
-
 import { expressMiddleware } from '@apollo/server/express4'
 
 import cors from 'cors'
 import http from 'http'
-
 import { json } from 'body-parser'
-
 import express from 'express'
 
-import User from './user/schema'
-import UserDB, { UserAttributes } from './database/models/user'
-import ContestDB, { ContestAttributes, Status } from './database/models/contest'
-import DrawingParticipation from './drawing-participation/schema'
-import Vote from './vote/schema'
-import Contest from './contest/schema'
-import { createToken, getEncryptedPassword, isPasswordValid } from './user/auth'
+import { mutations, queries, typeDefs } from './domains'
+import { Context, createContext } from './context'
 
 // instance before passing the instance to `expressMiddleware`
 const main = async (): Promise<void> => {
   const app = express()
   const httpServer = http.createServer(app)
 
-  const server = new ApolloServer({
-    typeDefs: [...User, ...Contest, ...Vote, ...DrawingParticipation],
+  const server = new ApolloServer<Context>({
+    typeDefs: typeDefs,
     resolvers: {
-      Query: {
-        user: async (_, { id }: { id: string }) => {
-          return await UserDB.findOne({
-            where: {
-              id,
-            },
-          })
-        },
-        contest: (_, { id }: { id: string }) => ({
-          id,
-          name: 'Contest numero uno',
-        }),
-        vote: (_, { id }: { id: string }) => ({ id, userId: '1' }),
-        drawingParticipation: (_, { id }: { id: string }) => ({
-          id,
-          userId: '1',
-          contestId: '2',
-        }),
-      },
-      Mutation: {
-        signup: async (_, user: UserAttributes) => {
-          const newUser = await UserDB.create({
-            ...user,
-            password: await getEncryptedPassword(user.password),
-          })
-
-          const token = createToken(newUser.id!)
-
-          return {
-            token,
-            user: newUser,
-          }
-        },
-        login: async (
-          _,
-          { email, password }: { email: string; password: string }
-        ) => {
-          const user = await UserDB.findOne({ where: { email } })
-
-          if (!user) {
-            throw new Error('No such user found')
-          }
-
-          const valid = await isPasswordValid(password, user.password)
-          if (!valid) {
-            throw new Error('Invalid password')
-          }
-
-          const token = createToken(user.id!)
-
-          return {
-            token,
-            user,
-          }
-        },
-        createContest: async (_, { name, adminUserId }: ContestAttributes) => {
-          const contest = await ContestDB.create({
-            name,
-            adminUserId,
-            status: Status.OPEN,
-          })
-
-          return contest
-        },
-      },
+      Query: queries,
+      Mutation: mutations,
     },
   })
 
@@ -99,7 +28,7 @@ const main = async (): Promise<void> => {
     '/graphql',
     cors<cors.CorsRequest>(),
     json(),
-    expressMiddleware(server)
+    expressMiddleware(server, { context: createContext })
   )
   await new Promise<void>((resolve) =>
     httpServer.listen({ port: 3000 }, resolve)
