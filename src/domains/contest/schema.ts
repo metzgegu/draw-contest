@@ -11,7 +11,7 @@ const Contest = `
   }
 
   type Mutation {
-    createContest(name: String!, adminUserId: String!): Contest 
+    createContest(name: String!): Contest 
   }
 `
 

@@ -4,15 +4,18 @@ import {
   type ContestInstance,
   Status,
 } from '../../database/models/contest'
+import { ensureUserLoggedIn } from '../user/auth';
 
 async function createContest(
   _: any,
-  { name, adminUserId }: ContestAttributes,
+  { name }: ContestAttributes,
   context: Context
 ): Promise<ContestInstance> {
+  ensureUserLoggedIn(context)
+
   const contest = await context.database.contest.create({
     name,
-    adminUserId,
+    adminUserId: context.currentUser?.id as string,
     status: Status.OPEN,
   })
 
