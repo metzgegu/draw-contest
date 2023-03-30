@@ -1,7 +1,5 @@
 describe('Drawing Participation', () => {
-  describe('Mutations', () => {
-
-  })
+  describe('Mutations', () => {})
 
   describe('Queries', () => {
     describe('drawingParticipation', () => {

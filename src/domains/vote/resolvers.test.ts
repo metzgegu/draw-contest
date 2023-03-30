@@ -1,11 +1,7 @@
 describe('Vote', () => {
-  describe('Mutations', () => {
-
-  })
+  describe('Mutations', () => {})
 
   describe('Queries', () => {
-    describe('vote', () => {
-
-    })
+    describe('vote', () => {})
   })
 })

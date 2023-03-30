@@ -2,7 +2,7 @@ import { DataTypes, type Model } from 'sequelize'
 import { sequelize } from '.'
 
 export interface UserAttributes {
-  id?: string
+  id?: number
   name: string
   email: string
   password: string

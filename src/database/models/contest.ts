@@ -9,10 +9,10 @@ export enum Status {
 }
 
 export interface ContestAttributes {
-  id?: string
+  id?: number
   name: string
   status: string
-  adminUserId: string
+  adminUserId: number
 }
 
 interface ContestCreationAttributes extends ContestAttributes {}
@@ -34,7 +34,7 @@ const Contest = sequelize.define<ContestInstance>('Contest', {
     type: DataTypes.STRING,
   },
   adminUserId: {
-    type: DataTypes.STRING,
+    type: DataTypes.NUMBER,
   },
 })
 

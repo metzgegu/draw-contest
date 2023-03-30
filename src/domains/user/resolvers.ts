@@ -1,8 +1,15 @@
-import { type Context } from '../../context';
-import { type UserAttributes, type UserInstance } from '../../database/models/user'
-import { createToken, getEncryptedPassword, isPasswordValid } from './auth';
+import { type Context } from '../../context'
+import {
+  type UserAttributes,
+  type UserInstance,
+} from '../../database/models/user'
+import { createToken, getEncryptedPassword, isPasswordValid } from './auth'
 
-async function user(_: any, { id }: { id: string }, context: Context): Promise<UserInstance | null> {
+async function user(
+  _: any,
+  { id }: { id: string },
+  context: Context
+): Promise<UserInstance | null> {
   return await context.database.user.findOne({
     where: {
       id,
@@ -10,7 +17,11 @@ async function user(_: any, { id }: { id: string }, context: Context): Promise<U
   })
 }
 
-async function signup(_: any, user: UserAttributes, context: Context): Promise<{ token: string, user: UserInstance }> {
+async function signup(
+  _: any,
+  user: UserAttributes,
+  context: Context
+): Promise<{ token: string; user: UserInstance }> {
   const newUser = await context.database.user.create({
     ...user,
     password: await getEncryptedPassword(user.password),
@@ -28,7 +39,7 @@ async function login(
   _: any,
   { email, password }: { email: string; password: string },
   context: Context
-): Promise<{ token: string, user: UserInstance }> {
+): Promise<{ token: string; user: UserInstance }> {
   const user = await context.database.user.findOne({ where: { email } })
 
   if (user === null) {
@@ -52,4 +63,4 @@ async function login(
 
 export const mutations = { signup, login }
 
-export const queries = { user } 
+export const queries = { user }

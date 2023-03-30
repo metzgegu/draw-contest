@@ -24,7 +24,7 @@ export function ensureUserLoggedIn(context: Context): void {
       extensions: {
         code: 'UNAUTHENTICATED',
       },
-    });
+    })
   }
 }
 
@@ -32,6 +32,6 @@ export function getTokenPayload(token: string): JwtPayload | string {
   return verify(token, APP_SECRET)
 }
 
-export function createToken(userId: string): string {
+export function createToken(userId: number): string {
   return sign({ userId }, APP_SECRET)
 }
