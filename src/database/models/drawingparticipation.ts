@@ -39,8 +39,8 @@ const DrawingParticipation = sequelize.define<DrawingParticipationInstance>(
       type: DataTypes.STRING,
     },
     s3link: {
-      type: DataTypes.STRING
-    }
+      type: DataTypes.STRING,
+    },
   }
 )
 

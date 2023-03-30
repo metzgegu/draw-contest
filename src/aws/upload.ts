@@ -9,7 +9,7 @@ const FILE_TYPE_ACCEPTED = ['image/jpeg', 'image/png']
 
 const upload = multer({
   fileFilter: (_, file, cb) => {
-    if (!FILE_TYPE_ACCEPTED.includes(file.mimetype as string)) {
+    if (!FILE_TYPE_ACCEPTED.includes(file.mimetype)) {
       cb(new Error('File mimetype is not supported'))
     } else {
       cb(null, true)
