@@ -13,6 +13,12 @@ module.exports = {
         type: Sequelize.INTEGER,
         primaryKey: true,
       },
+      status: {
+        type: Sequelize.STRING,
+      },
+      s3link: {
+        type: Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

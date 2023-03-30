@@ -10,6 +10,7 @@ import { mutations, queries, typeDefs } from './domains'
 import { Context, createContext } from './context'
 import { isAuthorizedToUpload } from './domains/user/auth'
 import { upload } from './aws/upload'
+import { DrawingParticipationInstance } from './database/models/drawingparticipation'
 
 // instance before passing the instance to `expressMiddleware`
 const main = async (): Promise<void> => {
@@ -36,8 +37,12 @@ const main = async (): Promise<void> => {
   app.post(
     '/upload',
     isAuthorizedToUpload,
-    upload.array('image'),
+    upload.single('image'),
     function (req, res, next) {
+      (res.locals.drawingParticipation as DrawingParticipationInstance).update({
+        s3link: (req.file as any as { location: string }).location
+      })
+
       res.send('Successfully uploaded')
     }
   )

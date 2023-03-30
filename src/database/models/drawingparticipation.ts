@@ -4,6 +4,8 @@ import { sequelize } from '.'
 export interface DrawingParticipationAttributes {
   userId: number
   contestId: number
+  status?: string
+  s3link?: string
 }
 
 interface DrawingParticipationCreationAttributes
@@ -33,6 +35,12 @@ const DrawingParticipation = sequelize.define<DrawingParticipationInstance>(
       allowNull: false,
       primaryKey: true,
     },
+    status: {
+      type: DataTypes.STRING,
+    },
+    s3link: {
+      type: DataTypes.STRING
+    }
   }
 )
 

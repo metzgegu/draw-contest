@@ -51,7 +51,7 @@ export const getUserFromJwt = async (
 
 export const isAuthorizedToUpload = async (
   req: Request,
-  _: Response,
+  res: Response,
   next: NextFunction
 ): Promise<void> => {
   const user = await getUserFromJwt(req.get('Authorization') as string)
@@ -71,6 +71,7 @@ export const isAuthorizedToUpload = async (
       const err = new Error('User is not registered to this contest')
       next(err)
     } else {
+      res.locals.drawingParticipation = drawingParticipation
       next()
     }
   }
