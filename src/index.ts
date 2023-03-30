@@ -8,6 +8,8 @@ import express from 'express'
 
 import { mutations, queries, typeDefs } from './domains'
 import { Context, createContext } from './context'
+import { isAuthorizedToUpload } from './domains/user/auth'
+import { upload } from './aws/upload'
 
 // instance before passing the instance to `expressMiddleware`
 const main = async (): Promise<void> => {
@@ -30,9 +32,20 @@ const main = async (): Promise<void> => {
     json(),
     expressMiddleware(server, { context: createContext })
   )
+
+  app.post(
+    '/upload',
+    isAuthorizedToUpload,
+    upload.array('image'),
+    function (req, res, next) {
+      res.send('Successfully uploaded')
+    }
+  )
+
   await new Promise<void>((resolve) =>
     httpServer.listen({ port: 3000 }, resolve)
   )
+
   console.log('🚀 Server ready at http://localhost:3000/')
 }
 

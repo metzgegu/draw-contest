@@ -1,3 +1,4 @@
 /node_modules/
 .local/
 yarn-error.log
+volume/

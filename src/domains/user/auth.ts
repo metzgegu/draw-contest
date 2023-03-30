@@ -1,7 +1,10 @@
 import bcrypt from 'bcrypt'
+import { type NextFunction, type Request, type Response } from 'express'
 import { GraphQLError } from 'graphql'
 import { type JwtPayload, sign, verify } from 'jsonwebtoken'
 import { type Context } from '../../context'
+import user, { type UserAttributes } from '../../database/models/user'
+import drawingparticipation from '../../database/models/drawingparticipation'
 
 const APP_SECRET = 'FOR-DEVELOPMENT-PURPOSE-ONLY'
 
@@ -25,6 +28,51 @@ export function ensureUserLoggedIn(context: Context): void {
         code: 'UNAUTHENTICATED',
       },
     })
+  }
+}
+
+export const getUserFromJwt = async (
+  token: string
+): Promise<UserAttributes | undefined> => {
+  try {
+    const userId = (getTokenPayload(token) as JwtPayload).userId as string
+
+    return (
+      await user.findOne({
+        where: {
+          id: userId,
+        },
+      })
+    )?.toJSON()
+  } catch {
+    return undefined
+  }
+}
+
+export const isAuthorizedToUpload = async (
+  req: Request,
+  _: Response,
+  next: NextFunction
+): Promise<void> => {
+  const user = await getUserFromJwt(req.get('Authorization') as string)
+
+  if (user === undefined || req.query?.contestId === undefined) {
+    const err = new Error('Not authorized')
+    next(err)
+  } else {
+    const drawingParticipation = await drawingparticipation.findOne({
+      where: {
+        userId: user?.id,
+        contestId: (req.query as { contestId: string }).contestId,
+      },
+    })
+
+    if (drawingParticipation === null) {
+      const err = new Error('User is not registered to this contest')
+      next(err)
+    } else {
+      next()
+    }
   }
 }
 

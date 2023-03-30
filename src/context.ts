@@ -1,9 +1,8 @@
 import user, { type UserAttributes } from './database/models/user'
 import contest from './database/models/contest'
-import { type JwtPayload } from 'jsonwebtoken'
-import { getTokenPayload } from './domains/user/auth'
 import { type ExpressContextFunctionArgument } from '@apollo/server/dist/esm/express4'
 import drawingParticipation from './database/models/drawingparticipation'
+import { getUserFromJwt } from './domains/user/auth'
 
 export interface Context {
   database: {
@@ -12,24 +11,6 @@ export interface Context {
     drawingParticipation: typeof drawingParticipation
   }
   currentUser: UserAttributes | undefined
-}
-
-export const getUserFromJwt = async (
-  token: string
-): Promise<UserAttributes | undefined> => {
-  try {
-    const userId = (getTokenPayload(token) as JwtPayload).userId as string
-
-    return (
-      await user.findOne({
-        where: {
-          id: userId,
-        },
-      })
-    )?.toJSON()
-  } catch {
-    return undefined
-  }
 }
 
 // eslint-disable-next-line @typescript-eslint/require-await
