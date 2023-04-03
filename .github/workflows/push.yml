@@ -13,12 +13,14 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version-file: '.nvmrc'
-          cache-dependency-path: 'yarn.lock'
+          cache-dependency-path: 'backend/yarn.lock'
           registry-url: 'https://npm.pkg.github.com'
           cache: 'yarn'
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+        working-directory: backend
 
       - name: Lint
         run: yarn lint
+        working-directory: backend
