@@ -11,9 +11,11 @@ import {
   queries as userQueries,
   mutations as userMutations,
 } from './user/resolvers'
-import { queries as voteQueries } from './vote/resolvers'
+import {
+  mutations as voteMutations,
+ queries as voteQueries } from './vote/resolvers'
 
-export const mutations = { ...contestMutations, ...userMutations }
+export const mutations = { ...contestMutations, ...userMutations, ...voteMutations }
 
 export const queries = {
   ...contestQueries,

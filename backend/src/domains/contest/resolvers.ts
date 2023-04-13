@@ -81,8 +81,6 @@ async function joinContest(
 ): Promise<ContestInstance | null> {
   ensureUserLoggedIn(context)
 
-  console.log(contestId)
-
   const contest = await context.database.contest.findOne({
     where: {
       id: contestId,
