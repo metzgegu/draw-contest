@@ -22,7 +22,7 @@ export async function isPasswordValid(
 }
 
 export function ensureUserLoggedIn(context: Context): void {
-  if (context.currentUser === null) {
+  if (!context.currentUser) {
     throw new GraphQLError('You are not authenticated', {
       extensions: {
         code: 'UNAUTHENTICATED',
@@ -78,7 +78,9 @@ export const isAuthorizedToUpload = async (
 }
 
 export function getTokenPayload(token: string): JwtPayload | string {
-  return verify(token, APP_SECRET)
+  const removedBearerToken = token.replace('Bearer ', '')
+
+  return verify(removedBearerToken, APP_SECRET)
 }
 
 export function createToken(userId: number): string {
