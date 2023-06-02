@@ -24,6 +24,16 @@ async function vote(
   if (drawingParticipation == null) {
     throw new Error('No such drawing participation')
   }
+  
+  const contest = await context.database.contest.findOne({
+    where: {
+      id: contestId,
+    },
+  })
+
+  if (contest?.status !== 'voting') {
+    throw new Error('The contest is not in voting phase')
+  }
 
   let vote = await context.database.vote.findOne({
     where: {
