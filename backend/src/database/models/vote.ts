@@ -1,42 +1,19 @@
-import { DataTypes, type Model } from 'sequelize'
-import { sequelize } from '.'
+import { Table, Model } from 'sequelize-typescript';
+import DrawingParticipation from './drawingparticipation'
+import User from './user'
+import Contest from './contest'
+import { Optional } from 'sequelize';
 
-export interface VoteParticipation {
-  userId: number
-  contestId: number
-  drawingUserId: number
+export interface VoteAttributes {
+  id: string
   rating: number
-}
-
-interface VoteCreationAttributes extends VoteParticipation {}
-
-export interface VoteInstance
-  extends Model<VoteParticipation, VoteCreationAttributes>,
-    VoteParticipation {
+  user: User
+  drawingParticipation: DrawingParticipation
   createdAt?: Date
   updatedAt?: Date
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-const Vote = sequelize.define<VoteInstance>('Vote', {
-  userId: {
-    type: DataTypes.NUMBER,
-    allowNull: false,
-    primaryKey: true,
-  },
-  contestId: {
-    type: DataTypes.NUMBER,
-    allowNull: false,
-    primaryKey: true,
-  },
-  drawingUserId: {
-    type: DataTypes.NUMBER,
-    allowNull: false,
-    primaryKey: true,
-  },
-  rating: {
-    type: DataTypes.NUMBER,
-  },
-})
+interface VoteCreationAttributes extends Optional<VoteAttributes, 'id'> {}
 
-export default Vote
+@Table
+export default class Vote extends Model<VoteAttributes, VoteCreationAttributes> {}

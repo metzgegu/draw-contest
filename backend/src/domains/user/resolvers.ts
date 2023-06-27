@@ -1,7 +1,6 @@
 import { type Context } from '../../context'
-import {
+import User, {
   type UserAttributes,
-  type UserInstance,
 } from '../../database/models/user'
 import { createToken, getEncryptedPassword, isPasswordValid } from './auth'
 
@@ -9,7 +8,7 @@ async function user(
   _: any,
   { id }: { id: string },
   context: Context
-): Promise<UserInstance | null> {
+): Promise<User | null> {
   return await context.database.user.findOne({
     where: {
       id,
@@ -21,7 +20,7 @@ async function signup(
   _: any,
   user: UserAttributes,
   context: Context
-): Promise<{ token: string; user: UserInstance }> {
+): Promise<{ token: string; user: User }> {
   const newUser = await context.database.user.create({
     ...user,
     password: await getEncryptedPassword(user.password),
@@ -39,7 +38,7 @@ async function login(
   _: any,
   { email, password }: { email: string; password: string },
   context: Context
-): Promise<{ token: string; user: UserInstance }> {
+): Promise<{ token: string; user: User }> {
   const user = await context.database.user.findOne({ where: { email } })
 
   if (user === null) {
@@ -48,7 +47,7 @@ async function login(
 
   console.log(await getEncryptedPassword(password))
 
-  const valid = await isPasswordValid(password, user.password)
+  const valid = await isPasswordValid(password, user.dataValues.password)
   if (!valid) {
     throw new Error('Invalid password')
   }

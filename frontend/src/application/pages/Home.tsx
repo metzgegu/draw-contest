@@ -10,6 +10,7 @@ import {
   createContestForm,
   createContestFormSchema,
 } from "../forms/createContestForm";
+import { useNavigate } from "solid-start";
 
 const CREATE_CONTEST_MUTATION = gql`
   mutation CreateContest($name: String!) {
@@ -24,7 +25,7 @@ const Error = ({ error }: { error: string }) => (
 );
 
 const NewContestForm = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const [createContest] = createMutation(CREATE_CONTEST_MUTATION);
 
@@ -35,11 +36,11 @@ const NewContestForm = () => {
       setError(createContestForm, "name", validationError.message);
       return;
     }
-    console.log({ formData });
     try {
       const result = await createContest({ variables: formData });
-      // @todo: navigate to the new contest
-      // navigate(`/contests/${result.createContest.id}`);
+ 
+      console.log(result.createContest.id)
+      navigate(`/contest/${result.createContest.id}`);
     } catch (error) {
       setError(createContestForm, "name", (error as Error).message);
       return;

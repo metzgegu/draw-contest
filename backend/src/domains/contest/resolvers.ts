@@ -1,9 +1,9 @@
 import { type Context } from '../../context'
-import {
+import Contest, {
   type ContestAttributes,
-  type ContestInstance,
   Status,
 } from '../../database/models/contest'
+import DrawingParticipation from '../../database/models/drawingparticipation'
 import { ensureUserLoggedIn } from '../user/auth'
 
 const stateMap = new Map()
@@ -17,18 +17,18 @@ async function createContest(
   _: any,
   { name }: ContestAttributes,
   context: Context
-): Promise<ContestInstance> {
+): Promise<Contest> {
   ensureUserLoggedIn(context)
 
   const contest = await context.database.contest.create({
     name,
-    adminUserId: context.currentUser?.id as number,
+    adminUser: context.currentUser!,
     status: Status.OPEN,
   })
 
   await context.database.drawingParticipation.create({
-    userId: context.currentUser!.id!,
-    contestId: contest.id!,
+    user: context.currentUser!,
+    contest: contest,
   })
 
   return contest
@@ -38,25 +38,25 @@ async function advanceContestNextStep(
   _: any,
   { id }: { id: string },
   context: Context
-): Promise<ContestInstance | null> {
+): Promise<Contest | null> {
   ensureUserLoggedIn(context)
 
-  const contest = await context.database.contest.findOne({
+  const contest = await context.database.contest.findOne<Contest>({
     where: {
       id,
     },
   })
-
+  
   if (contest === null) {
     throw new Error('No such contest found')
   }
 
-  if (context.currentUser!.id !== contest.adminUserId) {
-    console.log(context.currentUser, contest.adminUserId)
+  if (context.currentUser!.id !== contest.dataValues.adminUser.id) {
+    console.log(context.currentUser, contest.dataValues.adminUser.id)
     throw new Error('The contest do not belong to you')
   }
 
-  await contest.update({ status: stateMap.get(contest.status) as string })
+  await contest.update({ status: stateMap.get(contest.dataValues.status) as string })
   await contest.save()
 
   return contest
@@ -66,19 +66,22 @@ async function contest(
   _: any,
   { id }: { id: string },
   context: Context
-): Promise<ContestInstance | null> {
+): Promise<Contest | null> {
   return await context.database.contest.findOne({
     where: {
       id,
     },
+    include: DrawingParticipation
   })
+
+  
 }
 
 async function joinContest(
   _: any,
   { contestId }: { contestId: number },
   context: Context
-): Promise<ContestInstance | null> {
+): Promise<Contest | null> {
   ensureUserLoggedIn(context)
 
   const contest = await context.database.contest.findOne({
@@ -94,8 +97,8 @@ async function joinContest(
   const drawingParticipation =
     await context.database.drawingParticipation.findOne({
       where: {
-        userId: context.currentUser!.id!,
-        contestId: contest.id!,
+        user: context.currentUser!,
+        contest: contest,
       },
     })
 
@@ -104,8 +107,8 @@ async function joinContest(
   }
 
   await context.database.drawingParticipation.create({
-    userId: context.currentUser!.id!,
-    contestId: contest.id!,
+    user: context.currentUser!,
+    contest: contest,
   })
 
   return contest

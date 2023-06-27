@@ -5,6 +5,7 @@ import { type JwtPayload, sign, verify } from 'jsonwebtoken'
 import { type Context } from '../../context'
 import user, { type UserAttributes } from '../../database/models/user'
 import drawingparticipation from '../../database/models/drawingparticipation'
+import User from '../../database/models/user'
 
 const APP_SECRET = 'FOR-DEVELOPMENT-PURPOSE-ONLY'
 
@@ -33,7 +34,7 @@ export function ensureUserLoggedIn(context: Context): void {
 
 export const getUserFromJwt = async (
   token: string
-): Promise<UserAttributes | undefined> => {
+): Promise<User | null> => {
   try {
     const userId = (getTokenPayload(token) as JwtPayload).userId as string
 
@@ -43,9 +44,9 @@ export const getUserFromJwt = async (
           id: userId,
         },
       })
-    )?.toJSON()
+    )
   } catch {
-    return undefined
+    return null
   }
 }
 
@@ -56,14 +57,14 @@ export const isAuthorizedToUpload = async (
 ): Promise<void> => {
   const user = await getUserFromJwt(req.get('Authorization') as string)
 
-  if (user === undefined || req.query?.contestId === undefined) {
+  if (user === null || req.query?.contestId === undefined) {
     const err = new Error('Not authorized')
     next(err)
   } else {
     const drawingParticipation = await drawingparticipation.findOne({
       where: {
-        userId: user?.id,
-        contestId: (req.query as { contestId: string }).contestId,
+        user: user,
+        contest: { id: (req.query as { contestId: string }).contestId, }
       },
     })
 

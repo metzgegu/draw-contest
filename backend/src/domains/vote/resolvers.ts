@@ -1,5 +1,5 @@
 import { type Context } from '../../context'
-import { type VoteInstance } from '../../database/models/vote'
+import Vote from '../../database/models/vote'
 import { ensureUserLoggedIn } from '../user/auth'
 
 async function vote(
@@ -10,14 +10,14 @@ async function vote(
     rating,
   }: { drawingUserId: number; contestId: number; rating: number },
   context: Context
-): Promise<VoteInstance | null> {
+): Promise<Vote | null> {
   ensureUserLoggedIn(context)
 
   const drawingParticipation =
     await context.database.drawingParticipation.findOne({
       where: {
-        contestId,
-        userId: drawingUserId,
+        contest: { id: contestId },
+        user: { id: drawingUserId },
       },
     })
 
@@ -31,15 +31,14 @@ async function vote(
     },
   })
 
-  if (contest?.status !== 'voting') {
+  if (contest?.dataValues.status !== 'voting') {
     throw new Error('The contest is not in voting phase')
   }
 
   let vote = await context.database.vote.findOne({
     where: {
-      userId: context.currentUser?.id,
-      drawingUserId,
-      contestId,
+      user: context.currentUser!,
+      drawingParticipation: drawingParticipation,
     },
   })
 
@@ -47,9 +46,8 @@ async function vote(
     vote.update({ rating })
   } else {
     vote = await context.database.vote.create({
-      userId: context.currentUser?.id!,
-      drawingUserId,
-      contestId,
+      user: context.currentUser!,
+      drawingParticipation,
       rating,
     })
   }
@@ -59,15 +57,14 @@ async function vote(
 
 async function votesForOneDrawing(
   _: any,
-  { drawingUserId, contestId }: { drawingUserId: number; contestId: number },
+  { userId, contestId }: { userId: number; contestId: number },
   context: Context
-): Promise<VoteInstance[] | null> {
+): Promise<Vote[] | null> {
   ensureUserLoggedIn(context)
 
   const votes = await context.database.vote.findAll({
     where: {
-      contestId,
-      drawingUserId,
+      drawingParticipation: { contest: { id: contestId }, user: { id: userId } },
     },
   })
 
