@@ -5,14 +5,13 @@ import drawingParticipation from './database/models/drawingparticipation'
 import { getUserFromJwt } from './domains/user/auth'
 import vote from './database/models/vote'
 import User from './database/models/user'
-import DrawingParticipation from './database/models/drawingparticipation'
 import('./database/models')
 
 export interface Context {
   database: {
     user: typeof user
     contest: typeof contest
-    drawingParticipation: typeof DrawingParticipation
+    drawingParticipation: typeof drawingParticipation
     vote: typeof vote
   }
   currentUser: User | null

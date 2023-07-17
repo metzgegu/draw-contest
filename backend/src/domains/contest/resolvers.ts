@@ -4,6 +4,7 @@ import Contest, {
   Status,
 } from '../../database/models/contest'
 import DrawingParticipation from '../../database/models/drawingparticipation'
+import User from '../../database/models/user'
 import { ensureUserLoggedIn } from '../user/auth'
 
 const stateMap = new Map()
@@ -20,15 +21,20 @@ async function createContest(
 ): Promise<Contest> {
   ensureUserLoggedIn(context)
 
+  
+
   const contest = await context.database.contest.create({
-    name,
-    adminUser: context.currentUser!,
+    name: 'Test',
+    adminUser: context.currentUser!.dataValues as User,
+    adminUserId: context.currentUser!.dataValues.id,
     status: Status.OPEN,
   })
 
+  console.log('contest!.id', contest!.id)
+
   await context.database.drawingParticipation.create({
-    user: context.currentUser!,
-    contest: contest,
+    userId: context.currentUser!.dataValues.id,
+    contestId: contest!.id,
   })
 
   return contest
@@ -51,8 +57,8 @@ async function advanceContestNextStep(
     throw new Error('No such contest found')
   }
 
-  if (context.currentUser!.id !== contest.dataValues.adminUser.id) {
-    console.log(context.currentUser, contest.dataValues.adminUser.id)
+  if (context.currentUser!.id !== contest.dataValues.adminUser?.id) {
+    console.log(context.currentUser, contest.dataValues.adminUser?.id)
     throw new Error('The contest do not belong to you')
   }
 
@@ -97,8 +103,8 @@ async function joinContest(
   const drawingParticipation =
     await context.database.drawingParticipation.findOne({
       where: {
-        user: context.currentUser!,
-        contest: contest,
+        userId: context.currentUser!.id,
+        contestId: contest.id,
       },
     })
 
@@ -107,8 +113,8 @@ async function joinContest(
   }
 
   await context.database.drawingParticipation.create({
-    user: context.currentUser!,
-    contest: contest,
+    userId: context.currentUser!.id,
+    contestId: contest.id,
   })
 
   return contest

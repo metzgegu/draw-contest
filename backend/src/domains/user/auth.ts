@@ -63,8 +63,8 @@ export const isAuthorizedToUpload = async (
   } else {
     const drawingParticipation = await drawingparticipation.findOne({
       where: {
-        user: user,
-        contest: { id: (req.query as { contestId: string }).contestId, }
+        userId: user!.id,
+        contestId: (req.query as { contestId: string }).contestId
       },
     })
 

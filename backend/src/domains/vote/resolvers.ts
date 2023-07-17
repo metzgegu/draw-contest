@@ -16,8 +16,8 @@ async function vote(
   const drawingParticipation =
     await context.database.drawingParticipation.findOne({
       where: {
-        contest: { id: contestId },
-        user: { id: drawingUserId },
+        contestId: contestId,
+        userId: drawingUserId,
       },
     })
 
