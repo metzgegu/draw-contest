@@ -21,8 +21,6 @@ async function createContest(
 ): Promise<Contest> {
   ensureUserLoggedIn(context)
 
-  
-
   const contest = await context.database.contest.create({
     name: 'Test',
     adminUser: context.currentUser!.dataValues as User,
@@ -73,14 +71,14 @@ async function contest(
   { id }: { id: string },
   context: Context
 ): Promise<Contest | null> {
+  ensureUserLoggedIn(context)
+
   return await context.database.contest.findOne({
     where: {
       id,
     },
     include: DrawingParticipation
   })
-
-  
 }
 
 async function joinContest(

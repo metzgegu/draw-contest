@@ -37,6 +37,6 @@ export default class Contest extends Model<ContestAttributes, ContestCreationAtt
   @BelongsTo(() => User, 'adminUserId')
   adminUser: User | undefined
 
-  // @HasMany(() => DrawingParticipation)
-  // drawingParticipations: DrawingParticipation[] | undefined
+  @HasMany(() => DrawingParticipation)
+  drawingParticipations: DrawingParticipation[] | undefined
 }

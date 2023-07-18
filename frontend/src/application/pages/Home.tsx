@@ -39,7 +39,6 @@ const NewContestForm = () => {
     try {
       const result = await createContest({ variables: formData });
  
-      console.log(result.createContest.id)
       navigate(`/contest/${result.createContest.id}`);
     } catch (error) {
       setError(createContestForm, "name", (error as Error).message);
