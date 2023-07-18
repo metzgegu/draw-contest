@@ -27,6 +27,7 @@ const SIGNUP_MUTATION = gql`
 `;
 
 export const Signup = () => {
+  console.log('SIGNUP')
   const navigate = useNavigate();
 
   const [signup] = createMutation(SIGNUP_MUTATION);

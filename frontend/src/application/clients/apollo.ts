@@ -6,13 +6,16 @@ import jwtManager from "~/application/authentication/jwtManager";
 // @todo: use graphql endpoint from env
 const httpLink = new HttpLink({ uri: "http://localhost:3000/graphql" });
 
-const errorLink = onError(({ graphQLErrors, networkError }) => {
+const errorLink = (navigate: any) => onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors)
-    graphQLErrors.forEach(({ message, locations, path }) =>
+    graphQLErrors.forEach(({ message, locations, path, extensions }) => { 
       console.log(
-        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
+        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}, Code :${extensions.code}`
       )
-    );
+      if (extensions.code === 'UNAUTHENTICATED') {
+        navigate('/signupppp')
+      }
+    });
   if (networkError) console.log(`[Network error]: ${networkError}`);
 });
 
@@ -30,7 +33,7 @@ const authLink = new ApolloLink((operation, forward) => {
 
 // @todo: handle token expiration
 
-export const apolloClient = new ApolloClient({
-  link: from([errorLink, authLink.concat(httpLink)]),
+export const apolloClient = (navigate: any) => new ApolloClient({
+  link: from([errorLink(navigate), authLink.concat(httpLink)]),
   cache: new InMemoryCache(),
 });
