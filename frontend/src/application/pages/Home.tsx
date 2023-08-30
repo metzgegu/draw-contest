@@ -1,4 +1,4 @@
-import { createMutation, gql } from "@merged/solid-apollo";
+import { createMutation, createQuery, gql } from "@merged/solid-apollo";
 import { Field, Form, setError } from "@modular-forms/solid";
 import { createSignal, Show } from "solid-js";
 import { fromZodError } from "zod-validation-error";
@@ -11,6 +11,7 @@ import {
   createContestFormSchema,
 } from "../forms/createContestForm";
 import { useNavigate } from "solid-start";
+import ContestList from "../components/ContestList";
 
 const CREATE_CONTEST_MUTATION = gql`
   mutation CreateContest($name: String!) {
@@ -19,6 +20,16 @@ const CREATE_CONTEST_MUTATION = gql`
     }
   }
 `;
+
+const ADMIN_CONTESTS_QUERY = gql`
+  query AdminContestList {
+    adminContestList {
+      id
+      name
+      status
+    }
+  }
+`
 
 const Error = ({ error }: { error: string }) => (
   <div class="text-red-600 text-xs pt-1">{error}</div>
@@ -78,6 +89,12 @@ const NewContestForm = () => {
 export default function Home() {
   const [showContestForm, setShowContestForm] = createSignal(false);
 
+  const data = createQuery<{ adminContestList: { id: string, name: string, status: string }[]}>(ADMIN_CONTESTS_QUERY)
+
+  const getContestList = () => {
+    return data()?.adminContestList || []
+  }
+
   return (
     <>
       <Header />
@@ -109,6 +126,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <ContestList contests={getContestList()} />
     </>
   );
 }

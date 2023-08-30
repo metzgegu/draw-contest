@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     working_dir: /application
     ports:
-      - 3000:3000
+      - 8000:8000
     volumes:
       - ./backend:/application
       - draw-contest_server_node_modules:/application/node_modules

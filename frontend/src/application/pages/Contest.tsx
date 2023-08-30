@@ -1,14 +1,31 @@
 import { createQuery, gql } from "@merged/solid-apollo";
 import Header from "../components/Header";
+import { ErrorBoundary } from "solid-js";
+import { Navigate } from "@solidjs/router";
+import JoinContestButton from "../components/JoinContestButton";
 
 const QUERY = gql`
   query Contest($id: String!) {
     contest(id: $id) {
       name
       status
+      drawingParticipations {
+        userId
+      }
     }
   }
 `
+
+const fallback = (id: any) => (e: Error) => {
+  switch (e.message) {
+    case 'You are not authenticated':
+      return <Navigate href={`/login?redirect_url=/contest/${id}`} />
+    case 'User not registered in this contest':
+      return <JoinContestButton contestId={id}/>
+    default:
+      return <Navigate href="/" />
+  }
+}
 
 export default function Contest(props: { id: string }) {
   const data = createQuery<{ contest: { name: string, status: string }}>(QUERY, {
@@ -18,11 +35,11 @@ export default function Contest(props: { id: string }) {
   const getContestName = () => {
     return data()?.contest?.name
   }
-  // console.log('contest :', JSON.stringify(data()))
 
   return (
     <>
       <Header />
+      <ErrorBoundary fallback={fallback(props.id)}>
       <div class="flex flex-col ">
         <section class="flex gap-4 justify-center">
           <h1 class="text-3xl mb-8">Contest : {getContestName()}</h1>
@@ -80,6 +97,7 @@ export default function Contest(props: { id: string }) {
           <div class="flex"></div>
         </section>
       </div>
+      </ErrorBoundary>
     </>
   );
 }  

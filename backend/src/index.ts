@@ -50,10 +50,10 @@ const main = async (): Promise<void> => {
   )
 
   await new Promise<void>((resolve) =>
-    httpServer.listen({ port: 3000 }, resolve)
+    httpServer.listen({ port: 8000 }, resolve)
   )
 
-  console.log('🚀 Server ready at http://localhost:3000/')
+  console.log('🚀 Server ready at http://localhost:8000/')
 }
 
 main().catch((error) => {

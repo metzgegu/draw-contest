@@ -28,8 +28,6 @@ async function createContest(
     status: Status.OPEN,
   })
 
-  console.log('contest!.id', contest!.id)
-
   await context.database.drawingParticipation.create({
     userId: context.currentUser!.dataValues.id,
     contestId: contest!.id,
@@ -72,13 +70,19 @@ async function contest(
   context: Context
 ): Promise<Contest | null> {
   ensureUserLoggedIn(context)
-
-  return await context.database.contest.findOne({
+  
+  const contest = await context.database.contest.findOne({
     where: {
       id,
     },
-    include: DrawingParticipation
+    include: DrawingParticipation,
   })
+
+  if (!contest?.drawingParticipations?.find((drawingParticipation) => drawingParticipation.userId === context.currentUser!.id)) {
+    throw new Error('User not registered in this contest')
+  }
+
+  return contest
 }
 
 async function joinContest(
@@ -118,5 +122,21 @@ async function joinContest(
   return contest
 }
 
-export const queries = { contest }
+async function adminContestList(
+  _: any,
+  __: any,
+  context: Context
+): Promise<Contest[]> {
+  ensureUserLoggedIn(context)
+
+  const contests = await context.database.contest.findAll({
+    where: {
+      adminUserId: context.currentUser!.id,
+    },
+  })
+
+  return contests
+}
+
+export const queries = { contest, adminContestList }
 export const mutations = { createContest, advanceContestNextStep, joinContest }

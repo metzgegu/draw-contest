@@ -1,28 +1,20 @@
 import { ApolloProvider } from "@merged/solid-apollo";
 import { Suspense } from "solid-js";
 
-import { ErrorBoundary, FileRoutes, Routes, useNavigate } from "solid-start";
+import { ErrorBoundary, FileRoutes, Routes } from "solid-start";
 
 import { apolloClient } from "./application/clients/apollo";
-import { Router } from "@solidjs/router";
+import { Navigate, Router } from "@solidjs/router";
 
-// function AppErrorBoundary(props: { children: any }) {
-
-
-//   return (<ErrorBoundary fallback={() => console.log}>
-//     {props.children} 
-//   </ErrorBoundary>)
-// }
-
-function fallback(e: any) {
-  console.log('TEST', e)
-  return <></>
+function fallback(e: Error) {
+  if (e.message === 'You are not authenticated') {
+    return <Navigate href="/login" />
+  }
+  return <Navigate href="/" />
 }
 
 function InnerApp() {
-  const navigate = useNavigate();
-
-  return <ApolloProvider client={apolloClient(navigate)}>
+  return <ApolloProvider client={apolloClient}>
       <Suspense>
         <ErrorBoundary fallback={fallback}>
           <Routes>
