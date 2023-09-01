@@ -1,13 +1,17 @@
 const Vote = `
   type Vote {
     id: ID!
-    userId: String
-    drawingContestId: ID
-    note: Int
+    userId: ID
+    drawingParticipationId: ID
+    rating: Int
   }
 
   type Query {
-    vote(id: String!): Vote
+    votesForOneDrawing(drawingUserId: ID!, contestId: ID!): [Vote]
+  }
+
+  type Mutation {
+    vote(drawingUserId: ID!, contestId: ID!, rating: Int!): Vote
   }
 `
 

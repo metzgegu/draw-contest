@@ -2,26 +2,24 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('DrawingParticipations', {
+    await queryInterface.createTable('Votes', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      userId: {
-        allowNull: false,
+      rating: {
         type: Sequelize.INTEGER,
       },
       contestId: {
-        allowNull: false,
         type: Sequelize.INTEGER,
       },
-      status: {
-        type: Sequelize.STRING,
+      drawingUserId: {
+        type: Sequelize.INTEGER,
       },
-      s3link: {
-        type: Sequelize.STRING,
+      userId: {
+        type: Sequelize.INTEGER,
       },
       createdAt: {
         allowNull: false,
@@ -34,6 +32,6 @@ module.exports = {
     })
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('DrawingParticipations')
+    await queryInterface.dropTable('Votes')
   },
 }

@@ -1,47 +1,50 @@
-import { DataTypes, type Model } from 'sequelize'
-import { sequelize } from '.'
+import {
+  Table,
+  Model,
+  Column,
+  DataType,
+  HasOne,
+  BelongsTo,
+  PrimaryKey,
+  ForeignKey,
+} from 'sequelize-typescript'
+import Contest from './contest'
+import User from './user'
 
 export interface DrawingParticipationAttributes {
-  userId: number
-  contestId: number
   status?: string
   s3link?: string
+  contestId: number
+  userId: number
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 interface DrawingParticipationCreationAttributes
   extends DrawingParticipationAttributes {}
 
-export interface DrawingParticipationInstance
-  extends Model<
-      DrawingParticipationAttributes,
-      DrawingParticipationCreationAttributes
-    >,
-    DrawingParticipationAttributes {
-  createdAt?: Date
-  updatedAt?: Date
-}
+@Table
+class DrawingParticipation extends Model<
+  DrawingParticipationAttributes,
+  DrawingParticipationCreationAttributes
+> {
+  @Column(DataType.STRING)
+  status: string | undefined
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-const DrawingParticipation = sequelize.define<DrawingParticipationInstance>(
-  'DrawingParticipation',
-  {
-    userId: {
-      type: DataTypes.NUMBER,
-      allowNull: false,
-      primaryKey: true,
-    },
-    contestId: {
-      type: DataTypes.NUMBER,
-      allowNull: false,
-      primaryKey: true,
-    },
-    status: {
-      type: DataTypes.STRING,
-    },
-    s3link: {
-      type: DataTypes.STRING,
-    },
-  }
-)
+  @Column(DataType.STRING)
+  s3link: string | undefined
+
+  @ForeignKey(() => User)
+  userId: number | undefined
+
+  @BelongsTo(() => User, 'userId')
+  user: User | undefined
+
+  @ForeignKey(() => Contest)
+  contestId: number | undefined
+
+  @BelongsTo(() => Contest, 'contestId')
+  contest: Contest | undefined
+}
 
 export default DrawingParticipation

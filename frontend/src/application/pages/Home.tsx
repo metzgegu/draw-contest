@@ -1,4 +1,4 @@
-import { createMutation, gql } from "@merged/solid-apollo";
+import { createMutation, createQuery, gql } from "@merged/solid-apollo";
 import { Field, Form, setError } from "@modular-forms/solid";
 import { createSignal, Show } from "solid-js";
 import { fromZodError } from "zod-validation-error";
@@ -10,6 +10,8 @@ import {
   createContestForm,
   createContestFormSchema,
 } from "../forms/createContestForm";
+import { useNavigate } from "solid-start";
+import ContestList from "../components/ContestList";
 
 const CREATE_CONTEST_MUTATION = gql`
   mutation CreateContest($name: String!) {
@@ -19,12 +21,32 @@ const CREATE_CONTEST_MUTATION = gql`
   }
 `;
 
+const ADMIN_CONTESTS_QUERY = gql`
+  query AdminContestList {
+    adminContestList {
+      id
+      name
+      status
+    }
+  }
+`
+
+const JOINED_CONTESTS_QUERY = gql`
+  query JoinedContestList {
+    joinedContestList {
+      id
+      name
+      status
+    }
+  }
+`
+
 const Error = ({ error }: { error: string }) => (
   <div class="text-red-600 text-xs pt-1">{error}</div>
 );
 
 const NewContestForm = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const [createContest] = createMutation(CREATE_CONTEST_MUTATION);
 
@@ -35,11 +57,10 @@ const NewContestForm = () => {
       setError(createContestForm, "name", validationError.message);
       return;
     }
-    console.log({ formData });
     try {
       const result = await createContest({ variables: formData });
-      // @todo: navigate to the new contest
-      // navigate(`/contests/${result.createContest.id}`);
+ 
+      navigate(`/contest/${result.createContest.id}`);
     } catch (error) {
       setError(createContestForm, "name", (error as Error).message);
       return;
@@ -78,11 +99,34 @@ const NewContestForm = () => {
 export default function Home() {
   const [showContestForm, setShowContestForm] = createSignal(false);
 
+  const data = createQuery<{ adminContestList: { id: string, name: string, status: string }[]}>(ADMIN_CONTESTS_QUERY)
+
+  const getAdminContestList = () => {
+    return data()?.adminContestList || []
+  }
+  
+  const data2 = createQuery<{ joinedContestList: { id: string, name: string, status: string }[]}>(JOINED_CONTESTS_QUERY)
+
+  const getJoinedContestList = () => {
+    return data2()?.joinedContestList || []
+  }
+
+  const getRandomInt = (min: number, max: number) => {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+
   return (
     <>
       <Header />
-      <section class="overflow-hidden bg-[url(https://images.unsplash.com/photo-1602810319428-019690571b5b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80)] bg-cover bg-center bg-no-repeat">
-        <div class="bg-black/25 p-8 md:p-12 lg:px-16 lg:py-24">
+      <section class="relative overflow-hidden">
+        {[...Array(getRandomInt(10, 50)).keys()].map(() => (
+          <div class="absolute border-4 border-black z-0" style={{ width: `${getRandomInt(2, 10)}rem`, height: `${getRandomInt(2, 10)}rem`, top: `${getRandomInt(0, 100)}%`, "border-radius": `${getRandomInt(0, 100)}%`, right: `${getRandomInt(0, 100)}%`, "border-color": "#"+((1<<24)*Math.random()|0).toString(16)}}></div>
+        ))}
+
+        <div class="relative bg-black/25 p-8 md:p-12 lg:px-16 lg:py-12 z-10">
           <div class="text-center sm:text-left">
             <h2 class="text-2xl font-bold text-white sm:text-3xl md:text-5xl">
               Create a contest
@@ -97,7 +141,7 @@ export default function Home() {
                 fallback={
                   <button
                     onClick={() => setShowContestForm(!showContestForm())}
-                    class="inline-block rounded-full bg-indigo-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 focus:outline-none focus:ring focus:ring-yellow-400"
+                    class="inline-block btn"
                   >
                     Create contest
                   </button>
@@ -109,6 +153,18 @@ export default function Home() {
           </div>
         </div>
       </section>
+      {getAdminContestList()?.length > 0 && (
+        <section class="flex gap-4 justify-center">
+          <h1 class="text-3xl mb-8 mt-8">My Contests created :</h1>
+        </section>
+      )}
+      <ContestList contests={getAdminContestList()} />
+      {getJoinedContestList()?.length > 0 && (
+        <section class="flex gap-4 justify-center">
+          <h1 class="text-3xl mb-8 mt-8">Contests joined :</h1>
+        </section>
+      )}
+      <ContestList contests={getJoinedContestList()} />
     </>
   );
 }

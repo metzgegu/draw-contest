@@ -1,5 +1,16 @@
-import { DataTypes, type Model } from 'sequelize'
-import { sequelize } from '.'
+import { type Optional } from 'sequelize'
+import {
+  Table,
+  Model,
+  DataType,
+  Column,
+  HasMany,
+  HasOne,
+  BelongsTo,
+  ForeignKey,
+} from 'sequelize-typescript'
+import DrawingParticipation from './drawingparticipation'
+import User from './user'
 
 export enum Status {
   OPEN = 'OPEN',
@@ -9,33 +20,35 @@ export enum Status {
 }
 
 export interface ContestAttributes {
-  id?: number
+  id: string
   name: string
-  status: string
+  adminUser?: User
   adminUserId: number
-}
-
-interface ContestCreationAttributes extends ContestAttributes {}
-
-export interface ContestInstance
-  extends Model<ContestAttributes, ContestCreationAttributes>,
-    ContestAttributes {
+  status: string
+  drawingParticipations?: DrawingParticipation[]
   createdAt?: Date
   updatedAt?: Date
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-const Contest = sequelize.define<ContestInstance>('Contest', {
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  status: {
-    type: DataTypes.STRING,
-  },
-  adminUserId: {
-    type: DataTypes.NUMBER,
-  },
-})
+interface ContestCreationAttributes extends Optional<ContestAttributes, 'id'> {}
 
-export default Contest
+@Table
+export default class Contest extends Model<
+  ContestAttributes,
+  ContestCreationAttributes
+> {
+  @Column(DataType.STRING)
+  name: number | undefined
+
+  @Column(DataType.STRING)
+  status: string | undefined
+
+  @ForeignKey(() => User)
+  adminUserId: number | undefined
+
+  @BelongsTo(() => User, 'adminUserId')
+  adminUser: User | undefined
+
+  @HasMany(() => DrawingParticipation)
+  drawingParticipations: DrawingParticipation[] | undefined
+}

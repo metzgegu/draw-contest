@@ -4,10 +4,13 @@ const Contest = `
     name: String
     status: String
     adminUserId: ID
+    drawingParticipations: [DrawingParticipationWithUser!]!
   }
 
   type Query {
     contest(id: String!): Contest
+    adminContestList: [Contest]
+    joinedContestList: [Contest]
   }
 
   type Mutation {

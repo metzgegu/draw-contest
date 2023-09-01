@@ -5,6 +5,7 @@ import { type JwtPayload, sign, verify } from 'jsonwebtoken'
 import { type Context } from '../../context'
 import user, { type UserAttributes } from '../../database/models/user'
 import drawingparticipation from '../../database/models/drawingparticipation'
+import type User from '../../database/models/user'
 
 const APP_SECRET = 'FOR-DEVELOPMENT-PURPOSE-ONLY'
 
@@ -22,7 +23,7 @@ export async function isPasswordValid(
 }
 
 export function ensureUserLoggedIn(context: Context): void {
-  if (context.currentUser === null) {
+  if (context.currentUser == null) {
     throw new GraphQLError('You are not authenticated', {
       extensions: {
         code: 'UNAUTHENTICATED',
@@ -31,21 +32,17 @@ export function ensureUserLoggedIn(context: Context): void {
   }
 }
 
-export const getUserFromJwt = async (
-  token: string
-): Promise<UserAttributes | undefined> => {
+export const getUserFromJwt = async (token: string): Promise<User | null> => {
   try {
     const userId = (getTokenPayload(token) as JwtPayload).userId as string
 
-    return (
-      await user.findOne({
-        where: {
-          id: userId,
-        },
-      })
-    )?.toJSON()
+    return await user.findOne({
+      where: {
+        id: userId,
+      },
+    })
   } catch {
-    return undefined
+    return null
   }
 }
 
@@ -56,13 +53,13 @@ export const isAuthorizedToUpload = async (
 ): Promise<void> => {
   const user = await getUserFromJwt(req.get('Authorization') as string)
 
-  if (user === undefined || req.query?.contestId === undefined) {
+  if (user === null || req.query?.contestId === undefined) {
     const err = new Error('Not authorized')
     next(err)
   } else {
     const drawingParticipation = await drawingparticipation.findOne({
       where: {
-        userId: user?.id,
+        userId: user.id as number,
         contestId: (req.query as { contestId: string }).contestId,
       },
     })
@@ -78,7 +75,9 @@ export const isAuthorizedToUpload = async (
 }
 
 export function getTokenPayload(token: string): JwtPayload | string {
-  return verify(token, APP_SECRET)
+  const removedBearerToken = token.replace('Bearer ', '')
+
+  return verify(removedBearerToken, APP_SECRET)
 }
 
 export function createToken(userId: number): string {
