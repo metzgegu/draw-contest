@@ -71,16 +71,29 @@ async function contest(
 ): Promise<Contest | null> {
   ensureUserLoggedIn(context)
   
-  const contest = await context.database.contest.findOne({
+  let contest = await context.database.contest.findOne({
     where: {
       id,
     },
-    include: DrawingParticipation,
+    include: [DrawingParticipation],
   })
 
   if (!contest?.drawingParticipations?.find((drawingParticipation) => drawingParticipation.userId === context.currentUser!.id)) {
     throw new Error('User not registered in this contest')
   }
+
+  contest.drawingParticipations = await Promise.all(contest?.drawingParticipations?.map(async (drawingParticipation) => {
+      return {
+        ...drawingParticipation.dataValues,
+        user: (await context.database.contest.findOne({
+          where: {
+            id: drawingParticipation.userId,
+          },
+        }))?.dataValues
+      } as DrawingParticipation
+    }))
+
+    console.log(contest)
 
   return contest
 }
@@ -138,5 +151,24 @@ async function adminContestList(
   return contests
 }
 
-export const queries = { contest, adminContestList }
+async function joinedContestList(
+  _: any,
+  __: any,
+  context: Context
+): Promise<Contest[]> {
+  ensureUserLoggedIn(context)
+
+  const drawingParticipation = await context.database.drawingParticipation.findAll({
+    where: {
+      userId: context.currentUser!.id,
+    },
+    include: [Contest],
+  })
+
+  const contests = drawingParticipation.map((drawingParticipation) => drawingParticipation.contest).filter((contest) => (contest !== null && contest?.adminUserId !== context.currentUser!.id)) as Contest[]
+
+  return contests
+}
+
+export const queries = { contest, adminContestList, joinedContestList }
 export const mutations = { createContest, advanceContestNextStep, joinContest }

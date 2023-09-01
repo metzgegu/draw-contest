@@ -10,6 +10,7 @@ const Contest = `
   type Query {
     contest(id: String!): Contest
     adminContestList: [Contest]
+    joinedContestList: [Contest]
   }
 
   type Mutation {

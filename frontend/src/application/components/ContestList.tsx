@@ -1,21 +1,22 @@
+import Status from "./Status";
+
 export default function ContestList(props: { contests: { id: string, name: string, status: string }[] }) {
+  const copyLink = (id: string) => {
+    navigator.clipboard.writeText(window.location.origin + "/contest/" + id)
+    window.alert("Link copied to clipboard")
+  }
+
   return (
-    <div class="flex flex-col ">
-      <section class="flex gap-4 justify-center">
-        <h1 class="text-3xl mb-8">Contests</h1>
-      </section>
-      
-        <section class="flex gap-4 justify-center">
+    <div class="flex flex-col justify-center items-center">
+        <section class="flex gap-4 justify-center flex-col w-6/12">
         {props.contests.map((contest) => (
-          <a class="flex" href={"/contest/" + contest.id}>
-            <label class="p-4 border border-sky-500 rounded-lg h-min	">
-              Status : {contest.status}
-            </label>
-            <div>
-              <p>{contest.name}</p>
-              <p>{contest.id}</p>
+          <div class="flex shadow-xl rounded-lg px-4 py-2 my-2">
+            <Status status={contest.status}></Status>
+            <div class="flex justify-center flex-row pl-4 w-full">
+              <a class="flex justify-center flex-col cursor-pointer" href={"/contest/" + contest.id}>{contest.name}</a>
+              <button class="btn flex h-min m-auto mr-0" onClick={[copyLink, contest.id]}>Copy link</button>
             </div>
-          </a>
+          </div>
           )
         )}
         </section>

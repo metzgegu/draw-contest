@@ -31,7 +31,7 @@ class DrawingParticipation extends Model<DrawingParticipationAttributes, Drawing
   contestId: number | undefined
 
   @BelongsTo(() => Contest, 'contestId')
-  contest: User | undefined  
+  contest: Contest | undefined  
 }
 
 export default DrawingParticipation
