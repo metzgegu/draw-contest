@@ -4,7 +4,7 @@ import Contest, {
   Status,
 } from '../../database/models/contest'
 import DrawingParticipation from '../../database/models/drawingparticipation'
-import User from '../../database/models/user'
+import type User from '../../database/models/user'
 import { ensureUserLoggedIn } from '../user/auth'
 
 const stateMap = new Map()
@@ -30,7 +30,7 @@ async function createContest(
 
   await context.database.drawingParticipation.create({
     userId: context.currentUser!.dataValues.id,
-    contestId: contest!.id,
+    contestId: contest.id as number,
   })
 
   return contest
@@ -48,7 +48,7 @@ async function advanceContestNextStep(
       id,
     },
   })
-  
+
   if (contest === null) {
     throw new Error('No such contest found')
   }
@@ -58,7 +58,9 @@ async function advanceContestNextStep(
     throw new Error('The contest do not belong to you')
   }
 
-  await contest.update({ status: stateMap.get(contest.dataValues.status) as string })
+  await contest.update({
+    status: stateMap.get(contest.dataValues.status) as string,
+  })
   await contest.save()
 
   return contest
@@ -70,30 +72,42 @@ async function contest(
   context: Context
 ): Promise<Contest | null> {
   ensureUserLoggedIn(context)
-  
-  let contest = await context.database.contest.findOne({
+
+  const contest = await context.database.contest.findOne({
     where: {
       id,
     },
     include: [DrawingParticipation],
   })
 
-  if (!contest?.drawingParticipations?.find((drawingParticipation) => drawingParticipation.userId === context.currentUser!.id)) {
+  if (
+    contest?.drawingParticipations?.find(
+      (drawingParticipation) =>
+        drawingParticipation.userId === context.currentUser!.id
+    ) == null
+  ) {
     throw new Error('User not registered in this contest')
   }
 
-  contest.drawingParticipations = await Promise.all(contest?.drawingParticipations?.map(async (drawingParticipation) => {
-      return {
+  contest.drawingParticipations = await Promise.all(
+    contest?.drawingParticipations?.map(async (drawingParticipation) => {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      const drawingParticipationData: DrawingParticipation = {
         ...drawingParticipation.dataValues,
-        user: (await context.database.contest.findOne({
-          where: {
-            id: drawingParticipation.userId,
-          },
-        }))?.dataValues
+        user: (
+          await context.database.contest.findOne({
+            where: {
+              id: drawingParticipation.userId,
+            },
+          })
+        )?.dataValues,
       } as DrawingParticipation
-    }))
 
-    console.log(contest)
+      return drawingParticipationData
+    })
+  )
+
+  console.log(contest)
 
   return contest
 }
@@ -118,8 +132,8 @@ async function joinContest(
   const drawingParticipation =
     await context.database.drawingParticipation.findOne({
       where: {
-        userId: context.currentUser!.id,
-        contestId: contest.id,
+        userId: context.currentUser!.id as number,
+        contestId: contest.id as number,
       },
     })
 
@@ -128,8 +142,8 @@ async function joinContest(
   }
 
   await context.database.drawingParticipation.create({
-    userId: context.currentUser!.id,
-    contestId: contest.id,
+    userId: context.currentUser!.id as number,
+    contestId: contest.id as number,
   })
 
   return contest
@@ -144,7 +158,7 @@ async function adminContestList(
 
   const contests = await context.database.contest.findAll({
     where: {
-      adminUserId: context.currentUser!.id,
+      adminUserId: context.currentUser!.id as number,
     },
   })
 
@@ -158,14 +172,20 @@ async function joinedContestList(
 ): Promise<Contest[]> {
   ensureUserLoggedIn(context)
 
-  const drawingParticipation = await context.database.drawingParticipation.findAll({
-    where: {
-      userId: context.currentUser!.id,
-    },
-    include: [Contest],
-  })
+  const drawingParticipation =
+    await context.database.drawingParticipation.findAll({
+      where: {
+        userId: context.currentUser!.id as number,
+      },
+      include: [Contest],
+    })
 
-  const contests = drawingParticipation.map((drawingParticipation) => drawingParticipation.contest).filter((contest) => (contest !== null && contest?.adminUserId !== context.currentUser!.id)) as Contest[]
+  const contests = drawingParticipation
+    .map((drawingParticipation) => drawingParticipation.contest)
+    .filter(
+      (contest) =>
+        contest !== null && contest?.adminUserId !== context.currentUser!.id
+    ) as Contest[]
 
   return contests
 }

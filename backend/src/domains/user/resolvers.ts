@@ -1,7 +1,6 @@
 import { type Context } from '../../context'
-import User, {
-  type UserAttributes,
-} from '../../database/models/user'
+import type User from '../../database/models/user'
+import { type UserAttributes } from '../../database/models/user'
 import { createToken, getEncryptedPassword, isPasswordValid } from './auth'
 
 async function user(
@@ -26,7 +25,7 @@ async function signup(
     password: await getEncryptedPassword(user.password),
   })
 
-  const token = createToken(newUser.id!)
+  const token = createToken(newUser.id as number)
 
   return {
     token,
@@ -52,7 +51,7 @@ async function login(
     throw new Error('Invalid password')
   }
 
-  const token = createToken(user.id!)
+  const token = createToken(user.id as number)
 
   return {
     token,

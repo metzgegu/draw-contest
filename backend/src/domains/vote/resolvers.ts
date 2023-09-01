@@ -1,5 +1,5 @@
 import { type Context } from '../../context'
-import Vote from '../../database/models/vote'
+import type Vote from '../../database/models/vote'
 import { ensureUserLoggedIn } from '../user/auth'
 
 async function vote(
@@ -16,7 +16,7 @@ async function vote(
   const drawingParticipation =
     await context.database.drawingParticipation.findOne({
       where: {
-        contestId: contestId,
+        contestId,
         userId: drawingUserId,
       },
     })
@@ -24,7 +24,7 @@ async function vote(
   if (drawingParticipation == null) {
     throw new Error('No such drawing participation')
   }
-  
+
   const contest = await context.database.contest.findOne({
     where: {
       id: contestId,
@@ -38,12 +38,12 @@ async function vote(
   let vote = await context.database.vote.findOne({
     where: {
       user: context.currentUser!,
-      drawingParticipation: drawingParticipation,
+      drawingParticipation,
     },
   })
 
   if (vote != null) {
-    vote.update({ rating })
+    await vote.update({ rating })
   } else {
     vote = await context.database.vote.create({
       user: context.currentUser!,
@@ -64,7 +64,10 @@ async function votesForOneDrawing(
 
   const votes = await context.database.vote.findAll({
     where: {
-      drawingParticipation: { contest: { id: contestId }, user: { id: userId } },
+      drawingParticipation: {
+        contest: { id: contestId },
+        user: { id: userId },
+      },
     },
   })
 

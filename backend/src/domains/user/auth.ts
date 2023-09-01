@@ -5,7 +5,7 @@ import { type JwtPayload, sign, verify } from 'jsonwebtoken'
 import { type Context } from '../../context'
 import user, { type UserAttributes } from '../../database/models/user'
 import drawingparticipation from '../../database/models/drawingparticipation'
-import User from '../../database/models/user'
+import type User from '../../database/models/user'
 
 const APP_SECRET = 'FOR-DEVELOPMENT-PURPOSE-ONLY'
 
@@ -23,7 +23,7 @@ export async function isPasswordValid(
 }
 
 export function ensureUserLoggedIn(context: Context): void {
-  if (!context.currentUser) {
+  if (context.currentUser == null) {
     throw new GraphQLError('You are not authenticated', {
       extensions: {
         code: 'UNAUTHENTICATED',
@@ -32,19 +32,15 @@ export function ensureUserLoggedIn(context: Context): void {
   }
 }
 
-export const getUserFromJwt = async (
-  token: string
-): Promise<User | null> => {
+export const getUserFromJwt = async (token: string): Promise<User | null> => {
   try {
     const userId = (getTokenPayload(token) as JwtPayload).userId as string
 
-    return (
-      await user.findOne({
-        where: {
-          id: userId,
-        },
-      })
-    )
+    return await user.findOne({
+      where: {
+        id: userId,
+      },
+    })
   } catch {
     return null
   }
@@ -63,8 +59,8 @@ export const isAuthorizedToUpload = async (
   } else {
     const drawingParticipation = await drawingparticipation.findOne({
       where: {
-        userId: user!.id,
-        contestId: (req.query as { contestId: string }).contestId
+        userId: user.id as number,
+        contestId: (req.query as { contestId: string }).contestId,
       },
     })
 

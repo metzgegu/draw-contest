@@ -39,11 +39,9 @@ const main = async (): Promise<void> => {
     isAuthorizedToUpload,
     upload.single('image'),
     function (req, res, next) {
-      ;(res.locals.drawingParticipation as DrawingParticipation).update(
-        {
-          s3link: (req.file as any as { location: string }).location,
-        }
-      )
+      ;(res.locals.drawingParticipation as DrawingParticipation).update({
+        s3link: (req.file as any as { location: string }).location,
+      })
 
       res.send('Successfully uploaded')
     }

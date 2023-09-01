@@ -1,4 +1,13 @@
-import { Table, Model, Column, DataType, HasOne, BelongsTo, PrimaryKey, ForeignKey } from 'sequelize-typescript';
+import {
+  Table,
+  Model,
+  Column,
+  DataType,
+  HasOne,
+  BelongsTo,
+  PrimaryKey,
+  ForeignKey,
+} from 'sequelize-typescript'
 import Contest from './contest'
 import User from './user'
 
@@ -11,10 +20,14 @@ export interface DrawingParticipationAttributes {
   updatedAt?: Date
 }
 
-interface DrawingParticipationCreationAttributes extends DrawingParticipationAttributes {}
+interface DrawingParticipationCreationAttributes
+  extends DrawingParticipationAttributes {}
 
 @Table
-class DrawingParticipation extends Model<DrawingParticipationAttributes, DrawingParticipationCreationAttributes> {
+class DrawingParticipation extends Model<
+  DrawingParticipationAttributes,
+  DrawingParticipationCreationAttributes
+> {
   @Column(DataType.STRING)
   status: string | undefined
 
@@ -25,13 +38,13 @@ class DrawingParticipation extends Model<DrawingParticipationAttributes, Drawing
   userId: number | undefined
 
   @BelongsTo(() => User, 'userId')
-  user: User | undefined  
+  user: User | undefined
 
   @ForeignKey(() => Contest)
   contestId: number | undefined
 
   @BelongsTo(() => Contest, 'contestId')
-  contest: Contest | undefined  
+  contest: Contest | undefined
 }
 
 export default DrawingParticipation

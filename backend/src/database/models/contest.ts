@@ -1,7 +1,16 @@
-import { Optional } from 'sequelize'
-import { Table, Model, DataType, Column, HasMany, HasOne, BelongsTo, ForeignKey } from 'sequelize-typescript';
+import { type Optional } from 'sequelize'
+import {
+  Table,
+  Model,
+  DataType,
+  Column,
+  HasMany,
+  HasOne,
+  BelongsTo,
+  ForeignKey,
+} from 'sequelize-typescript'
 import DrawingParticipation from './drawingparticipation'
-import User from './user';
+import User from './user'
 
 export enum Status {
   OPEN = 'OPEN',
@@ -24,7 +33,10 @@ export interface ContestAttributes {
 interface ContestCreationAttributes extends Optional<ContestAttributes, 'id'> {}
 
 @Table
-export default class Contest extends Model<ContestAttributes, ContestCreationAttributes> {
+export default class Contest extends Model<
+  ContestAttributes,
+  ContestCreationAttributes
+> {
   @Column(DataType.STRING)
   name: number | undefined
 

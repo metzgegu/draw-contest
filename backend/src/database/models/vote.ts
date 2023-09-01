@@ -1,8 +1,15 @@
-import { Table, Model, Column, DataType, HasOne, BelongsTo } from 'sequelize-typescript';
+import {
+  Table,
+  Model,
+  Column,
+  DataType,
+  HasOne,
+  BelongsTo,
+} from 'sequelize-typescript'
 import DrawingParticipation from './drawingparticipation'
 import User from './user'
 import Contest from './contest'
-import { Optional } from 'sequelize';
+import { type Optional } from 'sequelize'
 
 export interface VoteAttributes {
   id: string
@@ -16,7 +23,10 @@ export interface VoteAttributes {
 interface VoteCreationAttributes extends Optional<VoteAttributes, 'id'> {}
 
 @Table
-export default class Vote extends Model<VoteAttributes, VoteCreationAttributes> {
+export default class Vote extends Model<
+  VoteAttributes,
+  VoteCreationAttributes
+> {
   @Column(DataType.NUMBER)
   rating: number | undefined
 

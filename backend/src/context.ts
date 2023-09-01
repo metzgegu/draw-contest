@@ -4,7 +4,7 @@ import { type ExpressContextFunctionArgument } from '@apollo/server/dist/esm/exp
 import drawingParticipation from './database/models/drawingparticipation'
 import { getUserFromJwt } from './domains/user/auth'
 import vote from './database/models/vote'
-import User from './database/models/user'
+import type User from './database/models/user'
 import('./database/models')
 
 export interface Context {
