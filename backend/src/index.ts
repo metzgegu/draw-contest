@@ -11,6 +11,8 @@ import { Context, createContext } from './context'
 import { isAuthorizedToUpload } from './domains/user/auth'
 import { upload } from './aws/upload'
 import DrawingParticipation from './database/models/drawingparticipation'
+import { clientCloudFront } from './aws/clientS3'
+import { CreateDistributionCommand, CreateDistributionCommandInput } from '@aws-sdk/client-cloudfront'
 
 // instance before passing the instance to `expressMiddleware`
 const main = async (): Promise<void> => {
@@ -25,6 +27,8 @@ const main = async (): Promise<void> => {
     },
   })
 
+  app.use(cors());
+
   await server.start()
 
   app.use(
@@ -38,9 +42,9 @@ const main = async (): Promise<void> => {
     '/upload',
     isAuthorizedToUpload,
     upload.single('image'),
-    function (req, res, next) {
+    async function (req, res, next) {
       ;(res.locals.drawingParticipation as DrawingParticipation).update({
-        s3link: (req.file as any as { location: string }).location,
+        s3link: (req.file as any as { location: string })?.location,
       })
 
       res.send('Successfully uploaded')

@@ -19,7 +19,7 @@ const DrawingParticipation = `
   }
 
   type Query {
-    drawingParticipation(id: String!): DrawingParticipation
+    drawingParticipation(contestId: String!): DrawingParticipation
   }
 `
 

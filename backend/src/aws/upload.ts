@@ -17,7 +17,7 @@ const upload = multer({
   },
   storage: multerS3({
     s3: clientS3,
-    bucket: 'mytestbucket',
+    bucket: 'image-bucket',
     metadata: function (_req, file, cb) {
       cb(null, { fieldName: file.fieldname })
     },

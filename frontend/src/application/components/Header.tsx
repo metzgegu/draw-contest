@@ -55,7 +55,7 @@ export default function Header() {
             <ul class="flex items-center gap-6 text-sm">
               <li>
                 <a
-                  class={`text-gray-500 transition hover:text-gray-500/75 border-b-4 ${active(
+                  class={`text-gray-500 transition hover:text-gray-500/75 ${active(
                     "/"
                   )}`}
                   href="/"
@@ -66,7 +66,7 @@ export default function Header() {
 
               <li>
                 <a
-                  class={`text-gray-500 transition hover:text-gray-500/75 border-b-4 ${active(
+                  class={`text-gray-500 transition hover:text-gray-500/75 ${active(
                     "/about"
                   )}`}
                   href="/about"

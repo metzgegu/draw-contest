@@ -115,7 +115,11 @@ export default function Home() {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+  }
+
+  const getUser = () => {
+    return JSON.parse(localStorage.getItem('user') || '{}')
+  }
 
 
   return (

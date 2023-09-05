@@ -13,4 +13,15 @@ const clientS3 = new S3Client({
   },
 })
 
-export { clientS3 }
+import { CloudFrontClient, AssociateAliasCommand } from "@aws-sdk/client-cloudfront";
+
+const clientCloudFront = new CloudFrontClient({
+  region: REGION,
+  endpoint: 'http://localstack:4566', // This is the localstack EDGE_PORT
+  credentials: {
+    accessKeyId: 'hh',
+    secretAccessKey: 'dd',
+  },
+});
+
+export { clientS3, clientCloudFront }

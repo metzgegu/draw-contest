@@ -20,7 +20,6 @@ const SIGNUP_MUTATION = gql`
         id
         email
         name
-        password
       }
     }
   }
@@ -44,6 +43,7 @@ export const Signup = () => {
       const result = await signup({ variables: formData });
 
       jwtManager.setToken(result.signup.token);
+      localStorage.setItem("user", JSON.stringify(result.signup.user));
       navigate("/");
     } catch (error) {
       setError(signupForm, "name", (error as Error).message);
